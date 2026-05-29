@@ -63,9 +63,9 @@ export default async function handler(req, res) {
     );
 
     if (!matchResponse.ok) {
-      throw new Error(
-        `Failed to fetch match data (status: ${matchResponse.status})`,
-      );
+      return res.status(matchResponse.status).json({
+        error: `Оsu! API error: Match not found or access denied (status: ${matchResponse.status})`,
+      });
     }
 
     const matchData = await matchResponse.json();
