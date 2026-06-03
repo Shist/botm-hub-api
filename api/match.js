@@ -1,3 +1,6 @@
+let cachedToken = null;
+let tokenExpirationTime = 0;
+
 export default async function handler(req, res) {
   const allowedOrigins = ["https://botm-hub.web.app", "http://localhost:5173"];
 
@@ -30,26 +33,34 @@ export default async function handler(req, res) {
   }
 
   try {
-    const tokenResponse = await fetch("https://osu.ppy.sh/oauth/token", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        client_id: process.env.OSU_CLIENT_ID,
-        client_secret: process.env.OSU_CLIENT_SECRET,
-        grant_type: "client_credentials",
-        scope: "public",
-      }),
-    });
+    let accessToken = cachedToken;
 
-    if (!tokenResponse.ok) {
-      throw new Error("Failed to get osu! authorization token");
+    if (!accessToken || Date.now() > tokenExpirationTime) {
+      const tokenResponse = await fetch("https://osu.ppy.sh/oauth/token", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          client_id: process.env.OSU_CLIENT_ID,
+          client_secret: process.env.OSU_CLIENT_SECRET,
+          grant_type: "client_credentials",
+          scope: "public",
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error("Failed to get osu! authorization token");
+      }
+
+      const tokenData = await tokenResponse.json();
+      accessToken = tokenData.access_token;
+
+      cachedToken = accessToken;
+      tokenExpirationTime =
+        Date.now() + tokenData.expires_in * 1000 - 5 * 60 * 1000;
     }
-
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
 
     const matchResponse = await fetch(
       `https://osu.ppy.sh/api/v2/matches/${id}`,
@@ -64,7 +75,7 @@ export default async function handler(req, res) {
 
     if (!matchResponse.ok) {
       return res.status(matchResponse.status).json({
-        error: `Оsu! API error: Match not found or access denied (status: ${matchResponse.status})`,
+        error: `Osu! API error: Match not found or access denied (status: ${matchResponse.status})`,
       });
     }
 
