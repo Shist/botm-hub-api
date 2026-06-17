@@ -14,29 +14,38 @@ The main purpose of the API is to act as a proxy server between the client appli
 ## 📁 Project Structure
 
 - `api/match.ts` — endpoint for fetching multiplayer lobby data. Validates `match_id`, fetches the authorization token, and uses while-loop pagination to bypass the default 100-events limit, returning the full chronological history of the match.
+- `api/verify-player.ts` — endpoint for player verification. Fetches player data by `username` or `id`, verifies their existence, and checks if the player's `country_code` is `BY` (Belarus) to secure the app registration flow.
 
 ## 🛠 Local Development Setup
 
 To run serverless functions locally, the Vercel CLI is used.
 
 1. Install dependencies (types for Vercel):
-   ```bash
+
+```bash
    npm install
-   ```
+```
+
 2. Install Vercel CLI (if not already installed):
-   ```bash
+
+```bash
    npm i -g vercel
-   ```
+```
+
 3. Create an `.env` file in the project root and specify your osu! OAuth credentials:
-   ```env
+
+```env
    OSU_CLIENT_ID=your_osu_client_id
    OSU_CLIENT_SECRET=your_osu_client_secret
-   ```
+```
+
 4. Start the local server:
-   ```bash
+
+```bash
    vercel dev
-   ```
-5. The endpoint will be available at `http://localhost:3000/api/match?id=...`
+```
+
+5. The endpoints will be available at `http://localhost:3000/api/...`
 
 ---
 
@@ -54,26 +63,35 @@ To run serverless functions locally, the Vercel CLI is used.
 ## 📁 Структура проекта
 
 - `api/match.ts` — эндпоинт для получения данных о мультиплеерном лобби. Валидирует `match_id`, получает токен авторизации и использует while-loop пагинацию для обхода лимита в 100 событий, возвращая полную хронологическую историю матча.
+- `api/verify-player.ts` — эндпоинт для верификации игроков. Получает данные игрока по `username` или `id`, проверяет его существование и соответствие флага (`country_code === BY`), чтобы защитить процесс регистрации в приложении.
 
 ## 🛠 Запуск для локальной разработки
 
 Для запуска serverless-функций локально используется Vercel CLI.
 
 1. Установите зависимости (типы для Vercel):
-   ```bash
+
+```bash
    npm install
-   ```
+```
+
 2. Установите Vercel CLI (если еще не установлен):
-   ```bash
+
+```bash
    npm i -g vercel
-   ```
+```
+
 3. Создайте файл `.env` в корне проекта и укажите ваши данные osu! OAuth:
-   ```env
+
+```env
    OSU_CLIENT_ID=your_osu_client_id
    OSU_CLIENT_SECRET=your_osu_client_secret
-   ```
+```
+
 4. Запустите локальный сервер:
-   ```bash
+
+```bash
    vercel dev
-   ```
-5. Эндпоинт будет доступен по адресу `http://localhost:3000/api/match?id=...`
+```
+
+5. Эндпоинты будут доступны по адресу `http://localhost:3000/api/...`
